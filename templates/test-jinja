@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<body>
+<table class="icinga-graphite" style="vertical-align: top;">
+<thead>
+<tr style="height: 100px; width: 600px;">
+<td style="background-color: #1093bc; width: 600px; height: 100px;" colspan="3"><img src="https://icinga.com/wp-content/uploads/2014/06/logo_icinga_white-e1407071914762.png" alt="icinga_logo" width="200" height="78" /></td>
+</tr>
+</thead></table>
+{% for img64 in img_list %}
+<p><img src="data:image/png;base64 ,{{ img64 }}",alt="red Dot" style="display: block; margin-left: auto; margin-right: auto;"/></p>
+{% endfor %}
+</body>
+</html>
