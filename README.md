@@ -18,3 +18,14 @@ Those python modules are needed on the system:
 
 The HTML Templates can be copied and modified. Add your own template and reference it in the script.
 Templates are provided via the jinja2 templating engine. Please have a look at the documentation for reference.
+
+### Choose Templates
+
+The Templating engine allows to customize or add own templates.
+Just use the custom variable:
+```
+vars.graphite_notification_template = "customer-x.html.j2"
+```
+Modify the content to your needs or your customer needs and add it to a template which is specific for the customer or user.
+
+ 
