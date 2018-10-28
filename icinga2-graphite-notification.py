@@ -18,11 +18,6 @@ ap.add_argument("-H", "--hostname", required=True, help="Icinga Hostname")
 ap.add_argument("-a", "--hostaddress", help="Hostaddress")
 ap.add_argument("-s", "--service", help="Icinga Servicename")
 ap.add_argument("-S", "--state", help="Service /Host state")
-#ap.add_argument("-U", "--web_host",
-#  help='Url of the icingaweb2 host ex.: https://i2.domain',
-#  default='http://192.168.33.5', nargs='?')
-#ap.add_argument("-u", "--username", nargs='?', help="Username to connect to Icinga Web 2")
-#ap.add_argument("-p", "--password", nargs='?', help="Password to connect to Icinga Web 2")
 ap.add_argument("-d", "--date", help="Date problem occured")
 ap.add_argument("-t", "--template", help="Choose template",
   default="graphite-body.html.j2", nargs='?')
@@ -35,9 +30,11 @@ ap.add_argument("-o", "--output", help="Service or Host ouptut")
 args = vars(ap.parse_args())
 
 # Setup Defaults
+# local postfix credentials only if needed
 mailServer = 'localhost'
 smtpPassword = ''
 smtpUsername = ''
+# Icinga Web Basic Auth Credentials
 icingaWeb = 'http://localhost'
 username = 'username'
 password = 'password'
