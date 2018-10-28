@@ -1,0 +1,35 @@
+<html>
+{% include 'graphite-header.html.j2' %}
+<body>
+<table width=640>
+ <tr><th colspan=2 class=icinga width='640'><img src="cid:icinga-logo"></th></tr>
+ <tr><th style="background-color: #dd5b96;" colspan=2 class=icinga width='640' height='25'</th>{{ d_i2.notification_type|capitalize() }}</tr>
+ <tr><th width='144'><strong>Notification Type:</strong></th><td class={{ d_i2.state }}>{{ d_i2.state|capitalize() }}</td></tr>
+ <tr><th><strong>Hostname:</strong></th><td><a href='{{ d_i2.web_host }}/icingaweb2/monitoring/host/show?host={{ d_i2.hostname }}'>{{ d_i2.hostname }}</a></td></tr>
+{% if d_i2.service %}
+ <tr><th><strong>Service:</strong></th><td><a href='{{ d_i2.web_host }}/icingaweb2/monitoring/host/show?host={{ d_i2.hostname }}&service={{ d_i2.service }}'>{{ d_i2.service }}</a></td></tr>
+{% endif %}
+ <tr><th><strong>Address:</strong></th><td>{{ d_i2.hostaddress }}</td></tr>
+ <tr><th><strong>When:</strong></th><td>{{ d_i2.date }}</td></tr>
+{% if d_i2.comment %}
+ <tr><th><strong>Comment:</strong></th><td>{{ d_i2.comment}} [{{ d_i2.author }}]</td></tr>
+{% endif %}
+</table><br>
+<table width='640'>
+  <tr><th colspan=6 class=perfdata height='25'>Performance Data</th></tr>
+  <tr><th class=label > Label </th>
+    <th class=label > Value </th>
+    <th class=label > Warning </th>
+    <th class=label > Critical </th>
+    <th class=label > Min </th>
+    <th class=label > Max </th>
+  </tr>
+{% for p in perfdata %}
+  <tr><td>{{ p }}</td><td>{{ perfdata[p]["val"]}}</td><td>{{ perfdata[p]["warn"]}}</td><td>{{ perfdata[p]["crit"]}}</td><td>{{ perfdata[p]["min"] }}</td><td>{{ perfdata[p]["max"] }}</td></tr>
+{% endfor %}
+{% for key in img_dict.keys() %}
+  <tr><td colspan=6><img src="cid:graphite-graph-{{ key }}" width='640' ></td></tr>
+{% endfor %}
+</table>
+</body>
+</html>
