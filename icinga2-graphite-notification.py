@@ -39,6 +39,7 @@ icingaWeb = 'http://localhost'
 username = 'username'
 password = 'password'
 sender = 'no-reply@icinga.mail'
+logo = 'icinga-logo.png'
 
 
 i2 = {}
@@ -70,7 +71,7 @@ else:
 wd = os.path.dirname(os.path.abspath(__file__))
 tpl = wd + '/templates'
 #index = wd + '/index.html'
-icinga_logo = wd + '/img/icinga-logo.png'
+icinga_logo = wd + '/img/' + logo
 env = Environment(loader=FileSystemLoader(tpl))
 
 if i2['service']:
