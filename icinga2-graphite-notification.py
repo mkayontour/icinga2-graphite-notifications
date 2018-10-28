@@ -38,7 +38,7 @@ args = vars(ap.parse_args())
 mailServer = 'localhost'
 smtpPassword = ''
 smtpUsername = ''
-icingaWeb = 'https://192.168.33.5'
+icingaWeb = 'http://localhost'
 username = 'username'
 password = 'password'
 sender = 'no-reply@icinga.mail'
@@ -83,11 +83,18 @@ else:
   url = i2['web_host'] + '/icingaweb2/graphite/list/'
   url += 'hosts?host=' + i2['hostname']
 
-try:
-  html = requests.get(url, auth=(username, password))
-except requests.exceptions.RequestException as e:
-  print "Request to Icinga Web 2 failed: " + e.message
-  os.sys.exit(e.errno)
+if username and password:
+  try:
+    html = requests.get(url, auth=(username, password))
+  except requests.exceptions.RequestException as e:
+    print "Request to Icinga Web 2 failed: " + e.message
+    os.sys.exit(e.errno)
+else:
+  try:
+    html = requests.get(url)
+  except requests.exceptions.RequestException as e:
+    print "Request to Icinga Web 2 failed: " + e.message
+    os.sys.exit(e.errno)
 
 soup = BeautifulSoup(html.text, 'html.parser')
 
@@ -126,7 +133,7 @@ for p in pdata:
 
     else:
         perf[label] = {}
-        perf[label] = data
+        perf[label]['val'] = data
 
 template = env.get_template(i2['template'])
 html_mail = template.render(d_i2=i2,img_dict=img_dict,perfdata=perf)
@@ -137,8 +144,7 @@ mailBase['From'] = sender
 mailBase['To'] = contact
 mailBase.preamble = 'This is a multi-part message in MIME format.'
 mailAlt = MIMEMultipart('alternative')
-#mailText = MIMEText(msg)
-#mailAlt.attach(mailText)
+mailBase.attach(mailAlt)
 
 mailText = MIMEText(html_mail, 'html')
 mailAlt.attach(mailText)
