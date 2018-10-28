@@ -2,16 +2,17 @@
 
 ## Installation
 
-Clone or download the full repository into `/etc/icinga2/scripts` and copy the graphite-notifications.conf into your Icinga 2 configuration folder. 
+Clone or download the full repository into `/etc/icinga2/scripts` and copy the `check_command.conf` into your Icinga 2 configuration folder and reload Icinga 2.
 
 
 ## Requirements
 
 Those python modules are needed on the system:
-* jinja2
-* bs4
-* requests
-* base64
+* pip install Jinja2
+* pip install bs4
+* pip install requests
+* pip install smtplib
+* pip install argparse
 
 ## Templating
 
