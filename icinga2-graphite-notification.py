@@ -62,6 +62,7 @@ i2["date"] = args['date']
 i2["comment"] = args['comment']
 i2["author"] = args['author']
 i2["perfdata"] = args['perfdata']
+i2["output"] = args['output']
 
 
 if i2['service']:
