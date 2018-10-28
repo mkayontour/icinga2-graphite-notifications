@@ -28,4 +28,6 @@ vars.graphite_notification_template = "customer-x.html.j2"
 ```
 Modify the content to your needs or your customer needs and add it to a template which is specific for the customer or user.
 
- 
+### Add your own logo
+
+Put your logo into the `/img/` folder and modify the variable  
