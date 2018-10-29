@@ -20,7 +20,7 @@ ap.add_argument("-s", "--service", help="Icinga Servicename")
 ap.add_argument("-S", "--state", help="Service /Host state")
 ap.add_argument("-d", "--date", help="Date problem occured")
 ap.add_argument("-t", "--template", help="Choose template",
-  default="graphite-body.html.j2", nargs='?')
+                default="graphite-body.html.j2", nargs='?')
 ap.add_argument("-c", "--comment", help="Comment")
 ap.add_argument("-A", "--author", help="Comment Author")
 ap.add_argument("-n", "--notification_type", help="notification_type")
@@ -64,78 +64,82 @@ i2["output"] = args['output']
 
 
 if i2['service']:
-  subject = i2['notification_type'] + ' at ' + i2['hostname'] + ' ' + i2['service']
+    subject = i2['notification_type'] + ' at ' + i2['hostname']
+    subject += ' ' + i2['service']
 else:
-  subject = i2['notification_type'] + ' at ' + i2['hostname']
+    subject = i2['notification_type'] + ' at ' + i2['hostname']
 
 wd = os.path.dirname(os.path.abspath(__file__))
 tpl = wd + '/templates'
-#index = wd + '/index.html'
 icinga_logo = wd + '/img/' + logo
 env = Environment(loader=FileSystemLoader(tpl))
 
 if i2['service']:
-  url = i2['web_host'] + '/icingaweb2/graphite/list/'
-  url += 'services?host=' + i2['hostname']
-  url += '&service_description=' + i2["service"]
+    url = i2['web_host'] + '/icingaweb2/graphite/list/'
+    url += 'services?host=' + i2['hostname']
+    url += '&service_description=' + i2["service"]
 else:
-  url = i2['web_host'] + '/icingaweb2/graphite/list/'
-  url += 'hosts?host=' + i2['hostname']
+    url = i2['web_host'] + '/icingaweb2/graphite/list/'
+    url += 'hosts?host=' + i2['hostname']
 
 if username and password:
-  try:
-    html = requests.get(url, auth=(username, password))
-  except requests.exceptions.RequestException as e:
-    print "Request to Icinga Web 2 failed: " + e.message
-    os.sys.exit(e.errno)
+    try:
+        html = requests.get(url, auth=(username, password))
+    except requests.exceptions.RequestException as e:
+        print "Request to Icinga Web 2 failed: " + e.message
+        os.sys.exit(e.errno)
 else:
-  try:
-    html = requests.get(url)
-  except requests.exceptions.RequestException as e:
-    print "Request to Icinga Web 2 failed: " + e.message
-    os.sys.exit(e.errno)
+    try:
+        html = requests.get(url)
+    except requests.exceptions.RequestException() as e:
+        print "Request to Icinga Web 2 failed: " + e.message
+        os.sys.exit(e.errno)
 
 soup = BeautifulSoup(html.text, 'html.parser')
 
-for html in soup.find_all('div', attrs={"class":"images"}):
-  for src in html.find_all('img'):
-    src_url = i2['web_host'] + src.get('src')
-    src_url = src_url.replace("width=350","width=640")
-    img_url.append(src_url)
+for html in soup.find_all('div', attrs={"class": "images"}):
+    for src in html.find_all('img'):
+        src_url = i2['web_host'] + src.get('src')
+        src_url = src_url.replace("width=350", "width=640")
+        img_url.append(src_url)
 
 counter = int()
 for g in img_url:
     try:
-      graph_img = requests.get(g)
+        graph_img = requests.get(g)
     except requests.exceptions.RequestException as e:
-      print "Request to Icinga Web 2 failed: " + e.message
-      continue
+        print "Request to Icinga Web 2 failed: " + e.message
+        continue
     counter += 1
-    img_dict[str(counter)]= graph_img.content
+    img_dict[str(counter)] = graph_img.content
 
 pdata = i2['perfdata'].split(" ")
 for p in pdata:
     if '=' not in p:
         continue
 
-    (label,data) = p.split("=")
+    (label, data) = p.split("=")
     if (len(data.split(";")) is 5):
         perf[label] = {}
         (perf[label]["val"],
-        perf[label]["warn"],perf[label]["crit"]
-        ,perf[label]["min"],perf[label]["max"]) = data.split(";")
+         perf[label]['warn'],
+         perf[label]["crit"],
+         perf[label]["min"],
+         perf[label]["max"]) = data.split(";")
 
     elif (len(data.split(";")) is 4):
         perf[label] = {}
-        (perf[label]["val"],perf[label]["warn"]
-        ,perf[label]["crit"],perf[label]["min"]) = data.split(";")
+        (perf[label]["val"],
+         perf[label]["warn"],
+         perf[label]["crit"],
+         perf[label]["min"]) = data.split(";")
 
     else:
         perf[label] = {}
         perf[label]['val'] = data
 
 template = env.get_template(i2['template'])
-html_mail = template.render(d_i2=i2,img_dict=img_dict,perfdata=perf)
+html_mail = template.render(d_i2=i2, img_dict=img_dict, perfdata=perf)
 
 mailBase = MIMEMultipart('related')
 mailBase['Subject'] = subject
@@ -156,26 +160,26 @@ if os.path.exists(icinga_logo):
     mailBase.attach(mailImage)
 
 if img_dict:
-  for key, value in img_dict.items():
-    mailImage = MIMEImage(value, _subtype="png")
-    mailImage.add_header('Content-ID', '<graphite-graph-' + key + '>')
-    mailBase.attach(mailImage)
+    for key, value in img_dict.items():
+        mailImage = MIMEImage(value, _subtype="png")
+        mailImage.add_header('Content-ID', '<graphite-graph-' + key + '>')
+        mailBase.attach(mailImage)
 
 smtp = smtplib.SMTP()
 try:
-  smtp.connect(mailServer)
+    smtp.connect(mailServer)
 except socket.error as e:
-  print "Unable to connect to SMTP server '" + mailServer + "': " + e.strerror
-  os.sys.exit(e.errno)
+    print "Unable to connect to SMTP server '" + mailServer + "': " + e.strerror
+    os.sys.exit(e.errno)
 
 if (smtpUsername and smtpPassword):
-  smtp.login(smtpUsername, smtpPassword)
+    smtp.login(smtpUsername, smtpPassword)
 
 try:
-  smtp.sendmail(sender, contact, mailBase.as_string())
-  smtp.quit()
+    smtp.sendmail(sender, contact, mailBase.as_string())
+    smtp.quit()
 except Exception as e:
-  print "Cannot send mail using SMTP: " + e.message
-  os.sys.exit(e.errno)
+    print "Cannot send mail using SMTP: " + e.message
+    os.sys.exit(e.errno)
 
 os.sys.exit(0)
